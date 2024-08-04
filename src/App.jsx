@@ -1,14 +1,17 @@
 // src/App.jsx
 import React from 'react';
-import DataFetcher from './DataFetcher';
+import TextInput from './TextInput';
 
-const App = () => {
+function App() {
   return (
-    <div>
-      <h1>My React Apples</h1>
-      <DataFetcher />
+    <div className="App">
+      <h1>Send Text Input to Flask API</h1>
+      <TextInput
+        label="Enter Text:"
+        placeholder="Type something..."
+      />
     </div>
   );
-};
+}
 
 export default App;

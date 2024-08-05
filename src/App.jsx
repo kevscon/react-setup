@@ -1,17 +1,16 @@
-// src/App.jsx
 import React from 'react';
-import TextInput from './TextInput';
+import ReverseText from './ReverseText';
 
 function App() {
   return (
     <div className="App">
-      <h1>Send Text Input to Flask API</h1>
-      <TextInput
-        label="Enter Text:"
-        placeholder="Type something..."
-      />
+      <header className="App-header">
+        <h1>Reverse Text App</h1>
+        <ReverseText />
+      </header>
     </div>
   );
 }
 
 export default App;
+

@@ -11,7 +11,7 @@ const ReverseText = () => {
     setInputText(text);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/reverse', { text });
+      const response = await axios.post('https://kevconsulting.pythonanywhere.com/reverse', { text });
       setReversedText(response.data.reversed_text);
     } catch (error) {
       console.error('Error reversing text:', error);

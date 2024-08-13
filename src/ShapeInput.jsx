@@ -13,7 +13,7 @@ const TextProcessingComponent = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/', { text: inputText });
+      const response = await axios.post('https://kevconsulting.pythonanywhere.com/', { text: inputText });
       setProcessedData(response.data);
       setInputText('');
     } catch (error) {

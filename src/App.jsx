@@ -1,10 +1,10 @@
-import ShapeInput from './ShapeInput';
+import ShapeSearch from './ShapeSearch'
 
 const App = () => {
   return (
     <div>
       <h1>My Vite React App</h1>
-      <ShapeInput />
+      <ShapeSearch />
     </div>
   );
 };

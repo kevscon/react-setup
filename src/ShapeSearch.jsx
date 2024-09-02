@@ -77,7 +77,7 @@ const SearchableList = () => {
       setShapeData(response.data.shape_props);
       setPropLabels(response.data.prop_labels);
       setUnits(response.data.units);
-      setImageSrc("/src/assets/img/" + response.data.shape_type + ".png");
+      setImageSrc("./assets/img/" + response.data.shape_type + ".png");
     } catch (error) {
       console.error('Error processing text:', error);
     }

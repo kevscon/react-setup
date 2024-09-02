@@ -23,32 +23,46 @@ const useFetchItems = (url) => {
   return { items, error };
 };
 
-// Custom hook to handle search logic
-const useSearch = (items, searchTerm) => {
-  return items.filter((item) =>
-    item.toLowerCase().replace(/\s/g, '').includes(searchTerm.toLowerCase().replace(/\s/g, ''))
-  );
-};
-
 const SearchableList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showList, setShowList] = useState(false);
-  const [processedData, setProcessedData] = useState({});
+  const [shapeData, setShapeData] = useState([]);
+  const [propLabels, setPropLabels] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [imageSrc, setImageSrc] = useState('');
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [highlightedIndex, setHighlightedIndex] = useState(null);
 
   const { items } = useFetchItems(`${API_URL}/shape-labels`);
-  const filteredItems = useSearch(items, searchTerm);
+
+  useEffect(() => {
+    // Update filtered items whenever items or searchTerm changes
+    const filterItems = () => {
+      if (searchTerm.trim() === '') {
+        setFilteredItems([]);
+        setShowList(false);
+        return;
+      }
+
+      const filtered = items.filter((item) =>
+        item.toLowerCase().replace(/\s/g, '').includes(searchTerm.toLowerCase().replace(/\s/g, ''))
+      );
+
+      setFilteredItems(filtered);
+      setShowList(filtered.length > 0);
+    };
+
+    filterItems();
+  }, [items, searchTerm]);
+
+  useEffect(() => {
+    if (filteredItems.includes(searchTerm.trim())) {
+      handleSubmit(searchTerm.trim());
+    }
+  }, [filteredItems, searchTerm]);
 
   const handleSearchTermChange = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-    setShowList(term.trim().length > 0);
-
-    // Clear the table data when the search term changes
-    setProcessedData({});
-
-    if (filteredItems.includes(term.trim())) {
-      handleSubmit(term.trim());
-    }
+    setSearchTerm(e.target.value);
   };
 
   const handleItemClick = (item) => {
@@ -60,7 +74,10 @@ const SearchableList = () => {
   const handleSubmit = async (term) => {
     try {
       const response = await axios.post(API_URL, { text: term });
-      setProcessedData(response.data);
+      setShapeData(response.data.shape_props);
+      setPropLabels(response.data.prop_labels);
+      setUnits(response.data.units);
+      setImageSrc("/src/assets/img/" + response.data.shape_type + ".png");
     } catch (error) {
       console.error('Error processing text:', error);
     }
@@ -68,6 +85,7 @@ const SearchableList = () => {
 
   return (
     <div>
+      <div>
       <h1>Search for Steel Shape</h1>
       <input
         type="text"
@@ -80,22 +98,31 @@ const SearchableList = () => {
           }
         }}
       />
+      </div>
+      {imageSrc && <img src={imageSrc} style={{ marginTop: '20px', maxWidth: '35%', height: 'auto' }} />}
       {showList && (
-        <ul>
+        <ul className="list-group">
           {filteredItems.map((item, index) => (
-            <li key={index} onClick={() => handleItemClick(item)}>
+            <li 
+            key={index} 
+            className={`list-group-item ${highlightedIndex === index ? 'active' : ''}`}
+            onMouseEnter={() => setHighlightedIndex(index)}
+            onMouseLeave={() => setHighlightedIndex(null)}
+            onClick={() => handleItemClick(item)}
+            >
               {item}
             </li>
           ))}
         </ul>
       )}
       <h2>Shape Properties</h2>
-      <table className="table table-striped">
+      <table className="table table-striped" style={{ width: '50%' }}>
         <tbody>
-          {Object.keys(processedData).map((key) => (
-            <tr key={key}>
-              <td>{key}</td>
-              <td>{processedData[key]}</td>
+          {shapeData.map((item, index) => (
+            <tr key={index}>
+              <td className="border-end" dangerouslySetInnerHTML={{ __html: propLabels[index] }} />
+              <td className="text-end">{shapeData[index]}</td>
+              <td className="text-start" dangerouslySetInnerHTML={{ __html: units[index] }} />
             </tr>
           ))}
         </tbody>

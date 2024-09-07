@@ -13,7 +13,7 @@ const useFetchItems = (url) => {
         const response = await axios.get(url);
         setItems(response.data);
       } catch (err) {
-        setError('Shape not found. Please check input.');
+        setError(err);
         console.error('Error fetching items:', err);
       }
     };
@@ -33,17 +33,11 @@ const SearchableList = () => {
   const [filteredItems, setFilteredItems] = useState([]);
   const [highlightedIndex, setHighlightedIndex] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
 
-  const { items, error: fetchError } = useFetchItems(`${API_URL}/shape-labels`);
-
-  useEffect(() => {
-    if (fetchError) {
-      setErrorMessage(fetchError);
-    }
-  }, [fetchError]);
+  const { items } = useFetchItems(`${API_URL}/shape-labels`);
 
   useEffect(() => {
+    // Update filtered items whenever items or searchTerm changes
     const filterItems = () => {
       if (searchTerm.trim() === '') {
         setFilteredItems([]);
@@ -84,14 +78,13 @@ const SearchableList = () => {
       const response = await axios.post(API_URL, { text: term });
       setShowList(false);
       setLoading(true);
+      // await new Promise(resolve => setTimeout(resolve, 3000));
       setShapeData(response.data.shape_props);
       setPropLabels(response.data.prop_labels);
       setUnits(response.data.units);
       setImageSrc("/img/" + response.data.shape_type + ".png");
       setLoading(false);
-      setErrorMessage(null); // Clear any previous error message
     } catch (error) {
-      setErrorMessage('Shape data not found.');
       console.error('Error processing text:', error);
     }
   };
@@ -99,18 +92,18 @@ const SearchableList = () => {
   return (
     <div>
       <div>
-        <h1>Search for Steel Shape</h1>
-        <input
-          type="text"
-          placeholder="Type shape..."
-          value={searchTerm}
-          onChange={handleSearchTermChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSubmit(searchTerm);
-            }
-          }}
-        />
+      <h1>Search for Steel Shape</h1>
+      <input
+        type="text"
+        placeholder="Type shape..."
+        value={searchTerm}
+        onChange={handleSearchTermChange}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSubmit(searchTerm);
+          }
+        }}
+      />
       </div>
       {loading && (
         <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -119,21 +112,16 @@ const SearchableList = () => {
           </div>
         </div>
       )}
-      {errorMessage && (
-        <div className="alert alert-danger" role="alert">
-          {errorMessage}
-        </div>
-      )}
       {imageSrc && <img src={imageSrc} style={{ marginTop: '20px', maxWidth: '35%', height: 'auto' }} />}
       {showList && (
         <ul className="list-group" style={{ width: '200px' }}>
           {filteredItems.map((item, index) => (
             <li 
-              key={index} 
-              className={`list-group-item ${highlightedIndex === index ? 'active' : ''}`}
-              onMouseEnter={() => setHighlightedIndex(index)}
-              onMouseLeave={() => setHighlightedIndex(null)}
-              onClick={() => handleItemClick(item)}
+            key={index} 
+            className={`list-group-item ${highlightedIndex === index ? 'active' : ''}`}
+            onMouseEnter={() => setHighlightedIndex(index)}
+            onMouseLeave={() => setHighlightedIndex(null)}
+            onClick={() => handleItemClick(item)}
             >
               {item}
             </li>

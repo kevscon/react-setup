@@ -1,8 +1,9 @@
 import ShapeSearch from './ShapeSearch'
+import './index.css';
 
 const App = () => {
   return (
-    <div>
+    <div className="page-container">
       <ShapeSearch />
     </div>
   );
